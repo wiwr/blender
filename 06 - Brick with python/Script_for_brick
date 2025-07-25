@@ -1,0 +1,21 @@
+import bpy
+import bmesh
+from math import pi
+
+# Remove existing objects
+bpy.ops.object.select_all(action='SELECT')
+bpy.ops.object.delete(use_global=False)
+
+brick_length = 31.8
+brick_width = 15.8
+brick_height = 9.6
+
+stud_diameter = 4.8
+stud_height = 1.8
+stud_spacing = 8.0
+
+bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, brick_height / 2))
+brick = bpy.context.active_object
+brick.scale = (brick_length /2, brick_width / 2, brick_height /2) 
+brick.name = "Brick"
+

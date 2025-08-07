@@ -1,0 +1,66 @@
+import bpy
+from mathutils import Vector
+
+def create_panel(name, size, location):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=location)
+    obj = bpy.context.active_object
+    obj.name = name
+    obj.scale = Vector((size[0] / 2, size[1] / 2, size[2] / 2))  # Blender cube default is 2x2x2
+    bpy.ops.object.transform_apply(scale=True)
+    return obj
+
+def create_kitchen_cabinet():
+    # Remove all objects first
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete(use_global=False)
+
+    # Cabinet dimensions
+    cabinet_width = 0.8     # meters
+    cabinet_depth = 0.6
+    cabinet_height = 0.9
+    panel_thickness = 0.018  # typical 18mm plywood or MDF
+
+    panels = []
+
+    # Side Panels
+    side_size = (panel_thickness, cabinet_depth, cabinet_height)
+    side_left_loc = (-cabinet_width / 2 + panel_thickness / 2, 0, cabinet_height / 2)
+    side_right_loc = (cabinet_width / 2 - panel_thickness / 2, 0, cabinet_height / 2)
+    panels.append(create_panel("Side_Left", side_size, side_left_loc))
+    panels.append(create_panel("Side_Right", side_size, side_right_loc))
+
+    # Top and Bottom Panels
+    horizontal_size = (cabinet_width - 2 * panel_thickness, cabinet_depth, panel_thickness)
+    bottom_loc = (0, 0, panel_thickness / 2)
+    top_loc = (0, 0, cabinet_height - panel_thickness / 2)
+    panels.append(create_panel("Bottom", horizontal_size, bottom_loc))
+    panels.append(create_panel("Top", horizontal_size, top_loc))
+
+    # Back Panel
+    back_size = (cabinet_width, panel_thickness, cabinet_height)
+    back_loc = (0, -cabinet_depth / 2 + panel_thickness / 2, cabinet_height / 2)
+    panels.append(create_panel("Back", back_size, back_loc))
+
+    # Door Panel (in front)
+    door_gap = 0.002
+    door_width = cabinet_width - 2 * door_gap
+    door_height = cabinet_height - 2 * door_gap
+    door_size = (door_width, panel_thickness, door_height)
+    door_loc = (0, cabinet_depth / 2 + panel_thickness / 2, cabinet_height / 2)
+    panels.append(create_panel("Door", door_size, door_loc))
+
+    # Handle
+    handle_size = (0.02, 0.02, 0.15)
+    handle_loc = (door_loc[0] + door_width / 2 - 0.05, door_loc[1] + 0.03, door_loc[2])
+    panels.append(create_panel("Handle", handle_size, handle_loc))
+
+    # Assign simple wood-like materials
+    for panel in panels:
+        mat = bpy.data.materials.new(name=f"{panel.name}_Mat")
+        mat.diffuse_color = (0.6, 0.4, 0.2, 1) if "Handle" not in panel.name else (0.1, 0.1, 0.1, 1)
+        panel.data.materials.append(mat)
+
+    print("✅ Cabinet made from panels created.")
+
+create_kitchen_cabinet()
+n
